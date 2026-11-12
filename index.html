@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bubbly Slide Rush</title>
+<meta name="description" content="A funny bubble racing game. Slide, dodge, collect and race your friends!">
+<meta property="og:title" content="Bubbly Slide Rush">
+<meta property="og:description" content="Can you beat my time? Race my ghost in Bubbly Slide Rush!">
+<meta property="og:image" content="https://azimkasimov.github.io/bubblyslide/preview.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-itunes-app" content="app-id=6829602884">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --sky-top: #3aa7ff; --sky-bottom: #bfe6ff; --card: #ffffff; --ink: #1d2a4a; --muted: #5a6a8a;
+    --green: #2fc85a; --green-dark: #1f9a42; --pink: #ff5fa2; --yellow: #ffd23a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; font-family: "Baloo 2", "Arial Rounded MT Bold", system-ui, sans-serif;
+    background: linear-gradient(var(--sky-top), var(--sky-bottom)); color: var(--ink);
+    display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+  }
+  .card {
+    width: 100%; max-width: 420px; background: var(--card); border-radius: 28px; padding: 28px 22px 24px;
+    text-align: center; box-shadow: 0 14px 40px rgba(20, 60, 120, 0.25);
+  }
+  .icon { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  h1 { font-size: 30px; margin: 14px 0 4px; letter-spacing: 0.5px; }
+  .lead { font-size: 18px; color: var(--muted); margin: 0 0 20px; line-height: 1.35; }
+  .btn {
+    display: block; width: 100%; padding: 16px 12px; margin: 10px 0; border-radius: 18px; border: 0;
+    font: inherit; font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; cursor: pointer;
+  }
+  .play { background: var(--green); box-shadow: 0 5px 0 var(--green-dark); }
+  .store { background: var(--ink); box-shadow: 0 5px 0 #0c1326; }
+  .ghost { background: #eef4ff; color: var(--ink); box-shadow: 0 5px 0 #c9d6ef; font-size: 17px; }
+  .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; word-break: break-all; color: var(--muted); margin-top: 6px; }
+  .steps { text-align: left; font-size: 16px; color: var(--muted); margin: 14px 4px 0; padding-left: 20px; line-height: 1.5; }
+  .hidden { display: none; }
+  .small { font-size: 13px; color: var(--muted); margin-top: 18px; }
+</style>
+</head>
+<body>
+<main class="card">
+  <img class="icon" src="icon.png" alt="">
+  <h1>Bubbly Slide Rush</h1>
+  <p class="lead" id="lead"></p>
+
+  <a class="btn play hidden" id="open"></a>
+  <a class="btn store" id="get"></a>
+  <a class="btn store hidden" id="other"></a>
+  <button class="btn ghost hidden" id="copy"></button>
+  <div class="code hidden" id="codeText"></div>
+  <ol class="steps hidden" id="steps"></ol>
+
+  <p class="small">© FunnyBall Games</p>
+</main>
+<script>
+(function () {
+  var APPLE = "https://apps.apple.com/app/id6829602884";
+  var GOOGLE = "https://play.google.com/store/apps/details?id=com.funnyballgames.bubbleslide";
+
+  // Short texts in the game's 10 languages (the page follows the phone's language).
+  var T = {
+    en: { lead: "A funny bubble racing game. Slide, dodge and race your friends!", leadC: "Your friend challenges you to a race! Can you beat their time?", leadS: "Your friend built a slide for you. Can you make it to the end?", open: "Open in the game", get: "Get the game", apple: "Download on the App Store", google: "Get it on Google Play", copy: "Copy the code", copied: "Copied!", s1: "Get Bubbly Slide Rush and open it.", s2: "Tap PARTY, then PASTE A CODE." },
+    de: { lead: "Ein lustiges Blasen-Rennspiel. Rutsche, weiche aus und fordere Freunde heraus!", leadC: "Dein Freund fordert dich zum Rennen heraus! Schaffst du seine Zeit?", leadS: "Dein Freund hat dir eine Rutsche gebaut. Schaffst du es bis ins Ziel?", open: "Im Spiel öffnen", get: "Spiel holen", apple: "Im App Store laden", google: "Bei Google Play holen", copy: "Code kopieren", copied: "Kopiert!", s1: "Hol dir Bubbly Slide Rush und öffne es.", s2: "Tippe auf PARTY, dann CODE EINFÜGEN." },
+    es: { lead: "Un divertido juego de carreras de burbujas. ¡Deslízate, esquiva y reta a tus amigos!", leadC: "¡Tu amigo te reta a una carrera! ¿Puedes superar su tiempo?", leadS: "Tu amigo te construyó un tobogán. ¿Llegarás al final?", open: "Abrir en el juego", get: "Consigue el juego", apple: "Descargar en el App Store", google: "Disponible en Google Play", copy: "Copiar el código", copied: "¡Copiado!", s1: "Descarga Bubbly Slide Rush y ábrelo.", s2: "Toca FIESTA y luego PEGAR CÓDIGO." },
+    fr: { lead: "Un jeu de course de bulles rigolo. Glisse, esquive et défie tes amis !", leadC: "Ton ami te défie à la course ! Peux-tu battre son temps ?", leadS: "Ton ami t'a construit un toboggan. Arriveras-tu au bout ?", open: "Ouvrir dans le jeu", get: "Obtenir le jeu", apple: "Télécharger dans l'App Store", google: "Disponible sur Google Play", copy: "Copier le code", copied: "Copié !", s1: "Installe Bubbly Slide Rush et ouvre-le.", s2: "Touche FÊTE, puis COLLER UN CODE." },
+    it: { lead: "Un divertente gioco di corse con le bolle. Scivola, schiva e sfida gli amici!", leadC: "Il tuo amico ti sfida a una gara! Riesci a battere il suo tempo?", leadS: "Il tuo amico ti ha costruito uno scivolo. Arriverai alla fine?", open: "Apri nel gioco", get: "Scarica il gioco", apple: "Scarica dall'App Store", google: "Disponibile su Google Play", copy: "Copia il codice", copied: "Copiato!", s1: "Scarica Bubbly Slide Rush e aprilo.", s2: "Tocca FESTA, poi INCOLLA CODICE." },
+    ja: { lead: "おもしろい バブルの レースゲーム。すべって、よけて、ともだちと きそおう！", leadC: "ともだちから レースの ちょうせんじょう！タイムを こえられるかな？", leadS: "ともだちが すべりだいを つくったよ。ゴールまで いけるかな？", open: "ゲームで ひらく", get: "ゲームを ダウンロード", apple: "App Storeで ダウンロード", google: "Google Playで てにいれよう", copy: "コードを コピー", copied: "コピーしたよ！", s1: "Bubbly Slide Rushを いれて ひらこう。", s2: "パーティー → コードを はりつけ を タップ。" },
+    pt: { lead: "Um jogo de corrida de bolhas engraçado. Deslize, desvie e desafie seus amigos!", leadC: "Seu amigo te desafiou para uma corrida! Consegue bater o tempo dele?", leadS: "Seu amigo construiu um escorregador para você. Consegue chegar ao fim?", open: "Abrir no jogo", get: "Baixe o jogo", apple: "Baixar na App Store", google: "Disponível no Google Play", copy: "Copiar o código", copied: "Copiado!", s1: "Baixe Bubbly Slide Rush e abra.", s2: "Toque em FESTA e depois em COLAR CÓDIGO." },
+    ru: { lead: "Весёлая гонка пузырей. Катись, уворачивайся и соревнуйся с друзьями!", leadC: "Друг вызывает тебя на гонку! Сможешь побить его время?", leadS: "Друг построил для тебя горку. Доберёшься до финиша?", open: "Открыть в игре", get: "Скачать игру", apple: "Загрузить в App Store", google: "Доступно в Google Play", copy: "Скопировать код", copied: "Скопировано!", s1: "Скачай Bubbly Slide Rush и открой.", s2: "Нажми ВЕЧЕРИНКА, затем ВСТАВИТЬ КОД." },
+    tr: { lead: "Komik bir baloncuk yarış oyunu. Kay, kaç ve arkadaşlarınla yarış!", leadC: "Arkadaşın seni yarışa davet ediyor! Süresini geçebilir misin?", leadS: "Arkadaşın sana bir kaydırak yaptı. Sona ulaşabilir misin?", open: "Oyunda aç", get: "Oyunu indir", apple: "App Store'dan indirin", google: "Google Play'den alın", copy: "Kodu kopyala", copied: "Kopyalandı!", s1: "Bubbly Slide Rush'ı indir ve aç.", s2: "PARTİ'ye, sonra KOD YAPIŞTIR'a dokun." },
+    zh: { lead: "超好玩的泡泡赛跑游戏。滑行、闪避，和朋友一起比赛！", leadC: "你的朋友向你发起挑战！你能打破他的纪录吗？", leadS: "你的朋友为你造了一条滑梯。你能滑到终点吗？", open: "在游戏中打开", get: "下载游戏", apple: "在 App Store 下载", google: "在 Google Play 获取", copy: "复制代码", copied: "已复制！", s1: "下载并打开 Bubbly Slide Rush。", s2: "点击「派对」，再点「粘贴代码」。" }
+  };
+  // Invite links (?i=CODE): the welcome gift and where to type the code in the game.
+  var GEMS = 20;
+  var I = {
+    en: { lead: "Your friend invited you! Get the game and use their code for {g} free gems.", s2: "Tap PARTY, then INVITE FRIENDS, then ENTER A CODE." },
+    de: { lead: "Dein Freund hat dich eingeladen! Hol dir das Spiel und nutze seinen Code für {g} Edelsteine gratis.", s2: "Tippe auf PARTY, dann FREUNDE EINLADEN, dann CODE EINGEBEN." },
+    es: { lead: "¡Tu amigo te invitó! Consigue el juego y usa su código para recibir {g} gemas gratis.", s2: "Toca FIESTA, luego INVITA AMIGOS y luego INTRODUCIR CÓDIGO." },
+    fr: { lead: "Ton ami t'invite ! Installe le jeu et utilise son code pour {g} gemmes gratuites.", s2: "Touche FÊTE, puis INVITER DES AMIS, puis ENTRER UN CODE." },
+    it: { lead: "Il tuo amico ti ha invitato! Scarica il gioco e usa il suo codice per {g} gemme gratis.", s2: "Tocca FESTA, poi INVITA AMICI, poi INSERISCI CODICE." },
+    ja: { lead: "ともだちから しょうたい！ゲームを いれて コードを つかうと ジェム{g}こ もらえるよ。", s2: "パーティー → ともだちを しょうたい → コードを いれる を タップ。" },
+    pt: { lead: "Seu amigo te convidou! Baixe o jogo e use o código dele para ganhar {g} gemas grátis.", s2: "Toque em FESTA, depois CONVIDAR AMIGOS e DIGITAR CÓDIGO." },
+    ru: { lead: "Друг пригласил тебя! Скачай игру и введи его код — получишь {g} кристаллов бесплатно.", s2: "Нажми ВЕЧЕРИНКА, затем ПОЗВАТЬ ДРУЗЕЙ, затем ВВЕСТИ КОД." },
+    tr: { lead: "Arkadaşın seni davet etti! Oyunu indir, kodunu kullan ve {g} bedava elmas kazan.", s2: "PARTİ'ye, sonra ARKADAŞ DAVET ET'e, sonra KOD GİR'e dokun." },
+    zh: { lead: "你的朋友邀请了你！下载游戏，用他的代码免费获得 {g} 颗宝石。", s2: "点击「派对」→「邀请朋友」→「输入代码」。" }
+  };
+  var lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+  var t = T[lang] || T.en;
+  var ti = I[lang] || I.en;
+
+  var params = new URLSearchParams(location.search);
+  var kind = params.has("c") ? "c" : params.has("s") ? "s" : params.has("i") ? "i" : null;
+  var code = kind ? (params.get(kind) || "").replace(/[^A-Za-z0-9_-]/g, "") : "";
+  if (!code) kind = null;
+
+  var ua = navigator.userAgent || "";
+  var apple = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var android = /Android/.test(ua);
+
+  function $(id) { return document.getElementById(id); }
+  $("lead").textContent = kind === "c" ? t.leadC : kind === "s" ? t.leadS : kind === "i" ? ti.lead.replace("{g}", GEMS) : t.lead;
+
+  var get = $("get"), other = $("other");
+  if (apple) { get.href = APPLE; get.textContent = t.apple; }
+  else if (android) { get.href = GOOGLE; get.textContent = t.google; }
+  else {
+    get.href = APPLE; get.textContent = t.apple;
+    other.href = GOOGLE; other.textContent = t.google; other.classList.remove("hidden");
+  }
+
+  if (!kind) {
+    // A plain link to the game: phones go straight to their store.
+    if (apple || android) location.replace(get.href);
+    return;
+  }
+
+  // A challenge or a slide: open it in the game if it's installed, otherwise get the game and paste the code.
+  var open = $("open");
+  open.href = "bubbleslide://" + kind + "/" + code;
+  open.textContent = t.open;
+  open.classList.remove("hidden");
+
+  var copy = $("copy");
+  copy.textContent = t.copy;
+  copy.classList.remove("hidden");
+  var link = location.origin + location.pathname + "?" + kind + "=" + code;
+  copy.onclick = function () {
+    var done = function () { copy.textContent = t.copied; };
+    if (navigator.clipboard) navigator.clipboard.writeText(link).then(done, done);
+    else done();
+  };
+  // An invite code is shown big and easy to type (ABC-DEF); copying it copies just the code.
+  if (kind === "i") {
+    code = code.toUpperCase();
+    link = code;
+    $("codeText").style.fontSize = "30px";
+    $("codeText").style.color = "#1d2a4a";
+    $("codeText").style.letterSpacing = "3px";
+  }
+  $("codeText").textContent = kind === "i" && code.length === 6 ? code.slice(0, 3) + "-" + code.slice(3) : code;
+  $("codeText").classList.remove("hidden");
+  var steps = $("steps");
+  [t.s1, kind === "i" ? ti.s2 : t.s2].forEach(function (s) { var li = document.createElement("li"); li.textContent = s; steps.appendChild(li); });
+  steps.classList.remove("hidden");
+})();
+</script>
+</body>
+</html>
